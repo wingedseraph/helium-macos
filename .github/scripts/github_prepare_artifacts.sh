@@ -1,7 +1,7 @@
 #!/bin/bash -eux
 # Simple script for packing Helium macOS build artifacts on GitHub Actions
 
-_target_cpu="${1:-x86_64}"
+_target_cpu="${1:-arm64}"
 
 _root_dir="$(dirname "$(greadlink -f "$0")")"
 _main_repo="$_root_dir/helium-chromium"
@@ -19,28 +19,10 @@ if [[ -f "$_root_dir/build_finished_$_target_cpu.log" ]] ; then
 
   xattr -cs out/Default/Helium.app
 
-  # Prepar the certificate for app signing
-  echo $MACOS_CERTIFICATE | base64 --decode > "$TMPDIR/certificate.p12"
-
-  security create-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
-  security default-keychain -s build.keychain
-  security unlock-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
-  security import "$TMPDIR/certificate.p12" -k build.keychain -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
-  security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_CI_KEYCHAIN_PWD" build.keychain
-
-  if ! [ -z "${PROD_MACOS_SPECIAL_ENTITLEMENTS_PROFILE_B64:-}" ]; then
-    export PROD_MACOS_SPECIAL_ENTITLEMENTS_PROFILE_PATH=$(mktemp)
-    echo "$PROD_MACOS_SPECIAL_ENTITLEMENTS_PROFILE_B64" \
-      | base64 --decode > "$PROD_MACOS_SPECIAL_ENTITLEMENTS_PROFILE_PATH"
-  fi
-
   export OUT_DMG_PATH="$_root_dir/$_file_name"
-  export NEEDS_APPDMG=1
-  "$_root_dir/sign_and_package_app.sh"
 
-  if ! [ -z "${PROD_MACOS_SPECIAL_ENTITLEMENTS_PROFILE_B64:-}" ]; then
-    rm -f "$PROD_MACOS_SPECIAL_ENTITLEMENTS_PROFILE_PATH"
-  fi
+  # Create DMG without code signing
+  hdiutil create -volname Helium -srcfolder out/Default/Helium.app -ov -format UDZO "$OUT_DMG_PATH"
 
   cd "$_root_dir"
   echo -e "md5: \nsha1: \nsha256: " | tee ./hash_types.txt
@@ -58,16 +40,6 @@ if [[ -f "$_root_dir/build_finished_$_target_cpu.log" ]] ; then
   # Use separate folder for build product, so that it can be used as individual asset in case the release action fails
   mkdir -p release_asset
   mv -vn ./*.dmg release_asset/ || true
-
-  if [ "$_target_cpu" = "x86_64" ]; then
-    DELTA_ARG="--x86"
-  else
-    DELTA_ARG="--arm"
-  fi
-
-  ./github_prep_sparkle_deltas.sh \
-    $DELTA_ARG "./release_asset/$_file_name" \
-    --out ./release_asset
 
   ls -kahl release_asset/
   du -hs release_asset/
