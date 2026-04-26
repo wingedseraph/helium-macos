@@ -3,7 +3,7 @@
 # Simple partitioned (2 of 3) build script for building Helium macOS binaries on GitHub Actions
 # Resuming build script for macOS
 
-_target_cpu="${1:-x86_64}"
+_target_cpu="${1:-arm64}"
 
 _root_dir="$(dirname "$(greadlink -f "$0")")"
 _src_dir="$_root_dir/build/src"
@@ -20,7 +20,6 @@ echo $(date +%s) | tee -a "$_root_dir/build_times_$_target_cpu.log"
 echo "status=running" >> $GITHUB_OUTPUT
 
 export SCCACHE_GHA_ENABLED=off
-
 export SCCACHE_WEBDAV_KEY_PREFIX="$_target_cpu"
 
 set +e
