@@ -9,22 +9,6 @@ inputs:
   GITHUB_TOKEN:
     required: true
     type: string
-  MACOS_CERTIFICATE:
-    type: string
-  MACOS_CERTIFICATE_PWD:
-    type: string
-  MACOS_CERTIFICATE_NAME:
-    type: string
-  MACOS_CI_KEYCHAIN_PWD:
-    type: string
-  PROD_MACOS_NOTARIZATION_APPLE_ID:
-    type: string
-  PROD_MACOS_NOTARIZATION_TEAM_ID:
-    type: string
-  PROD_MACOS_NOTARIZATION_PWD:
-    type: string
-  PROD_MACOS_SPECIAL_ENTITLEMENTS_PROFILE_B64:
-    type: string
 outputs:
   status:
     value: ${{ steps.build.outputs.status }}
@@ -54,14 +38,7 @@ runs:
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
-        MACOS_CERTIFICATE: ${{ inputs.MACOS_CERTIFICATE }}
-        MACOS_CERTIFICATE_PWD: ${{ inputs.MACOS_CERTIFICATE_PWD }}
-        MACOS_CERTIFICATE_NAME: ${{ inputs.MACOS_CERTIFICATE_NAME }}
-        MACOS_CI_KEYCHAIN_PWD: ${{ inputs.MACOS_CI_KEYCHAIN_PWD }}
-        PROD_MACOS_NOTARIZATION_APPLE_ID: ${{ inputs.PROD_MACOS_NOTARIZATION_APPLE_ID }}
-        PROD_MACOS_NOTARIZATION_TEAM_ID: ${{ inputs.PROD_MACOS_NOTARIZATION_TEAM_ID }}
-        PROD_MACOS_NOTARIZATION_PWD: ${{ inputs.PROD_MACOS_NOTARIZATION_PWD }}
-        PROD_MACOS_SPECIAL_ENTITLEMENTS_PROFILE_B64: ${{ inputs.PROD_MACOS_SPECIAL_ENTITLEMENTS_PROFILE_B64 }}
+
     - name: Upload part build artifact
       uses: actions/upload-artifact@v4
       with:
@@ -80,6 +57,5 @@ runs:
       with:
         name: ${{ steps.bake.outputs.file_name }}
         path: |
-          ${{ steps.bake.outputs.deltas }}
           ./release_asset/${{ steps.bake.outputs.file_name }}
           ./${{ steps.bake.outputs.file_name }}.hashes.md
