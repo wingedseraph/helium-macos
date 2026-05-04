@@ -21,6 +21,17 @@
      "//chrome/browser/safe_browsing:advanced_protection",
      "//chrome/browser/safe_browsing:metrics_collector",
      "//chrome/browser/safe_browsing:verdict_cache_manager_factory",
+--- a/chrome/browser/safe_browsing/BUILD.gn
++++ b/chrome/browser/safe_browsing/BUILD.gn
+@@ -92,6 +92,10 @@ static_library("safe_browsing") {
+   }
+ 
+ 
++  sources = []
++  deps = []
++  allow_circular_includes_from = []
++
+   # Note: is_android is not equivalent to safe_browsing_mode == 2.
 --- a/chrome/browser/extensions/BUILD.gn
 +++ b/chrome/browser/extensions/BUILD.gn
 @@ -857,9 +857,6 @@ source_set("extensions") {
