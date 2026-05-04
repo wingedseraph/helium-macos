@@ -23,7 +23,7 @@
      "//chrome/browser/safe_browsing:verdict_cache_manager_factory",
 --- a/chrome/browser/safe_browsing/BUILD.gn
 +++ b/chrome/browser/safe_browsing/BUILD.gn
-@@ -92,6 +92,10 @@ static_library("safe_browsing") {
+@@ -92,4 +92,8 @@ static_library("safe_browsing") {
    }
  
  
