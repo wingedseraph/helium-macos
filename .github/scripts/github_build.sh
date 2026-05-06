@@ -19,7 +19,8 @@ cd "$_src_dir"
 echo $(date +%s) | tee -a "$_root_dir/build_times_$_target_cpu.log"
 echo "status=running" >> $GITHUB_OUTPUT
 
-export SCCACHE_GHA_ENABLED=off
+export SCCACHE_GHA_ENABLED=on
+export SCCACHE_GHA_VERSION="$_target_cpu"
 export SCCACHE_WEBDAV_KEY_PREFIX="$_target_cpu"
 
 set +e
