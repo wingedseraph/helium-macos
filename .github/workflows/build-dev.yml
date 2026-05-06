@@ -1,0 +1,20 @@
+name: Build dev macOS binary (with dSYM for crash debugging)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-dev:
+    name: Build dev macOS (arm64)
+    strategy:
+      matrix:
+        arch: [arm64]
+      fail-fast: true
+    uses: ./.github/workflows/building.yml
+    secrets: inherit
+    with:
+      arch: ${{ matrix.arch }}
+      os: macos-latest

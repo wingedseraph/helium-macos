@@ -28,6 +28,7 @@ if ! [ -z "${PROD_MACOS_SPARKLE_ED_PUB_KEY-}" ]; then
 fi
 
 echo 'symbol_level=1' >> "$_src_dir/out/Default/args.gn"
+echo 'enable_dsyms=true' >> "$_src_dir/out/Default/args.gn"
 echo 'chrome_pgo_phase=2' >> "$_src_dir/out/Default/args.gn"
 
 cd "$_src_dir"

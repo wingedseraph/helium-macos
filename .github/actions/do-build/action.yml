@@ -59,3 +59,10 @@ runs:
         path: |
           ./release_asset/${{ steps.bake.outputs.file_name }}
           ./${{ steps.bake.outputs.file_name }}.hashes.md
+    - name: Upload dSYM for crash debugging
+      if: ${{ steps.build.outputs.status == 'finished' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: helium-dsym-${{ inputs.arch }}
+        path: build/src/out/Default/*.dSYM
+        if-no-files-found: ignore
