@@ -1,7 +1,9 @@
 # Fix GN safe_browsing and building with safebrowsing disabled on macOS
 
---- a/chrome/browser/BUILD.gn
-+++ b/chrome/browser/BUILD.gn
+Index: src/chrome/browser/BUILD.gn
+===================================================================
+--- src.orig/chrome/browser/BUILD.gn
++++ src/chrome/browser/BUILD.gn
 @@ -1174,10 +1174,6 @@ static_library("browser") {
      "//chrome/browser/profiles:profile_util_impl",
      "//chrome/browser/profiles:profile_manager",
@@ -21,9 +23,11 @@
      "//chrome/browser/safe_browsing:advanced_protection",
      "//chrome/browser/safe_browsing:metrics_collector",
      "//chrome/browser/safe_browsing:verdict_cache_manager_factory",
---- a/chrome/browser/safe_browsing/BUILD.gn
-+++ b/chrome/browser/safe_browsing/BUILD.gn
-@@ -92,4 +92,8 @@ static_library("safe_browsing") {
+Index: src/chrome/browser/safe_browsing/BUILD.gn
+===================================================================
+--- src.orig/chrome/browser/safe_browsing/BUILD.gn
++++ src/chrome/browser/safe_browsing/BUILD.gn
+@@ -96,6 +96,10 @@ static_library("safe_browsing") {
    }
  
  
@@ -32,8 +36,12 @@
 +  allow_circular_includes_from = []
 +
    # Note: is_android is not equivalent to safe_browsing_mode == 2.
---- a/chrome/browser/extensions/BUILD.gn
-+++ b/chrome/browser/extensions/BUILD.gn
+   # Sources and dependencies added to this block must not depend on anything
+   # requiring safe_browsing_mode != 0.
+Index: src/chrome/browser/extensions/BUILD.gn
+===================================================================
+--- src.orig/chrome/browser/extensions/BUILD.gn
++++ src/chrome/browser/extensions/BUILD.gn
 @@ -833,9 +833,6 @@ source_set("extensions") {
        # TODO(crbug.com/346472679): Remove this circular dependency.
        "//chrome/browser/web_applications/extensions",
@@ -52,8 +60,10 @@
        "//components/safe_browsing/core/common/proto:realtimeapi_proto",
        "//components/translate/content/browser",
        "//content/public/browser",
---- a/chrome/browser/ui/BUILD.gn
-+++ b/chrome/browser/ui/BUILD.gn
+Index: src/chrome/browser/ui/BUILD.gn
+===================================================================
+--- src.orig/chrome/browser/ui/BUILD.gn
++++ src/chrome/browser/ui/BUILD.gn
 @@ -592,18 +592,9 @@ static_library("ui") {
      "//components/reading_list/core",
      "//components/renderer_context_menu",
@@ -81,8 +91,10 @@
      "//components/segmentation_platform/public",
      "//components/sync",
      "//components/sync_user_events",
---- a/chrome/browser/safe_browsing/download_protection/download_protection_service.cc
-+++ b/chrome/browser/safe_browsing/download_protection/download_protection_service.cc
+Index: src/chrome/browser/safe_browsing/download_protection/download_protection_service.cc
+===================================================================
+--- src.orig/chrome/browser/safe_browsing/download_protection/download_protection_service.cc
++++ src/chrome/browser/safe_browsing/download_protection/download_protection_service.cc
 @@ -388,8 +388,12 @@ void DownloadProtectionService::ShowDeta
    Profile* profile = Profile::FromBrowserContext(
        content::DownloadItemUtils::GetBrowserContext(item));
@@ -96,8 +108,10 @@
        item->GetDangerType() ==
            download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT) {
      learn_more_url = GURL(chrome::kAdvancedProtectionDownloadLearnMoreURL);
---- a/chrome/browser/download/notification/download_item_notification.cc
-+++ b/chrome/browser/download/notification/download_item_notification.cc
+Index: src/chrome/browser/download/notification/download_item_notification.cc
+===================================================================
+--- src.orig/chrome/browser/download/notification/download_item_notification.cc
++++ src/chrome/browser/download/notification/download_item_notification.cc
 @@ -974,9 +974,13 @@ std::u16string DownloadItemNotification:
      }
      case download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT: {
@@ -112,8 +126,10 @@
        return l10n_util::GetStringFUTF16(
            requests_ap_verdicts
                ? IDS_PROMPT_UNCOMMON_DOWNLOAD_CONTENT_IN_ADVANCED_PROTECTION
---- a/chrome/browser/ui/webui/downloads/downloads_ui.cc
-+++ b/chrome/browser/ui/webui/downloads/downloads_ui.cc
+Index: src/chrome/browser/ui/webui/downloads/downloads_ui.cc
+===================================================================
+--- src.orig/chrome/browser/ui/webui/downloads/downloads_ui.cc
++++ src/chrome/browser/ui/webui/downloads/downloads_ui.cc
 @@ -40,6 +40,7 @@
  #include "components/history/core/common/pref_names.h"
  #include "components/prefs/pref_service.h"
@@ -137,8 +153,10 @@
    source->AddBoolean("requestsApVerdicts", requests_ap_verdicts);
  
    static constexpr webui::LocalizedString kStrings[] = {
---- a/chrome/browser/ui/extensions/download_danger_dialog.cc
-+++ b/chrome/browser/ui/extensions/download_danger_dialog.cc
+Index: src/chrome/browser/ui/extensions/download_danger_dialog.cc
+===================================================================
+--- src.orig/chrome/browser/ui/extensions/download_danger_dialog.cc
++++ src/chrome/browser/ui/extensions/download_danger_dialog.cc
 @@ -19,6 +19,7 @@
  #include "chrome/grit/branded_strings.h"
  #include "chrome/grit/generated_resources.h"
@@ -163,8 +181,10 @@
            filename);
      case download::DOWNLOAD_DANGER_TYPE_POTENTIALLY_UNWANTED:
        return l10n_util::GetStringFUTF16(IDS_PROMPT_DOWNLOAD_CHANGES_SETTINGS,
---- a/chrome/test/BUILD.gn
-+++ b/chrome/test/BUILD.gn
+Index: src/chrome/test/BUILD.gn
+===================================================================
+--- src.orig/chrome/test/BUILD.gn
++++ src/chrome/test/BUILD.gn
 @@ -7853,12 +7853,8 @@ test("unit_tests") {
        "//chrome/browser/apps/app_shim",
        "//chrome/browser/renderer_host:history_swiper",
@@ -178,8 +198,10 @@
        "//components/enterprise/platform_auth:enterprise_platform_auth",
        "//components/power_metrics",
        "//media/capture:test_support",
---- a/chrome/services/file_util/BUILD.gn
-+++ b/chrome/services/file_util/BUILD.gn
+Index: src/chrome/services/file_util/BUILD.gn
+===================================================================
+--- src.orig/chrome/services/file_util/BUILD.gn
++++ src/chrome/services/file_util/BUILD.gn
 @@ -50,10 +50,6 @@ source_set("file_util") {
      deps += [ "//components/services/filesystem/public/mojom" ]
    }
@@ -191,8 +213,10 @@
    if (safe_browsing_mode == 1) {
      sources += [
        "obfuscated_archive_analysis_delegate.cc",
---- a/chrome/browser/policy/configuration_policy_handler_list_factory.cc
-+++ b/chrome/browser/policy/configuration_policy_handler_list_factory.cc
+Index: src/chrome/browser/policy/configuration_policy_handler_list_factory.cc
+===================================================================
+--- src.orig/chrome/browser/policy/configuration_policy_handler_list_factory.cc
++++ src/chrome/browser/policy/configuration_policy_handler_list_factory.cc
 @@ -2393,15 +2393,6 @@ const PolicyToPreferenceMapEntry kSimple
      base::Value::Type::BOOLEAN },
  #endif
@@ -209,8 +233,10 @@
  #if BUILDFLAG(IS_CHROMEOS)
    { key::kDeviceAuthenticationFlowAutoReloadInterval,
      ash::prefs::kAuthenticationFlowAutoReloadInterval,
---- a/chrome/browser/chrome_content_browser_client.cc
-+++ b/chrome/browser/chrome_content_browser_client.cc
+Index: src/chrome/browser/chrome_content_browser_client.cc
+===================================================================
+--- src.orig/chrome/browser/chrome_content_browser_client.cc
++++ src/chrome/browser/chrome_content_browser_client.cc
 @@ -8132,33 +8132,6 @@ bool ChromeContentBrowserClient::SetupEm
      CHECK(!soda_language_pack_path.empty());
      CHECK(serializer->SetParameter(sandbox::policy::kParamSodaLanguagePackPath,
