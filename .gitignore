@@ -7,3 +7,18 @@ build/
 .pc
 
 resources/generated/
+
+# Generic patches copied by `he merge` from helium-chromium — only macOS-specific patches belong here
+patches/brave/
+patches/bromite/
+patches/debian/
+patches/helium/core/
+patches/helium/hop/
+patches/helium/settings/
+patches/helium/ui/
+patches/inox-patchset/
+patches/iridium-browser/
+patches/ungoogled-chromium/*.patch
+patches/upstream-fixes/
+patches/series.merged
+patches/series.prepend
