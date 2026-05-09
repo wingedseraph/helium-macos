@@ -22,3 +22,5 @@ patches/ungoogled-chromium/*.patch
 patches/upstream-fixes/
 patches/series.merged
 patches/series.prepend
+patches/series.orig
+*.patch~
