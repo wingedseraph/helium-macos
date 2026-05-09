@@ -1,5 +1,7 @@
---- a/chrome/browser/ui/views/frame/browser_view.cc
-+++ b/chrome/browser/ui/views/frame/browser_view.cc
+Index: src/chrome/browser/ui/views/frame/browser_view.cc
+===================================================================
+--- src.orig/chrome/browser/ui/views/frame/browser_view.cc
++++ src/chrome/browser/ui/views/frame/browser_view.cc
 @@ -1370,15 +1370,11 @@ std::vector<ContentsContainerView*> Brow
  
  #if BUILDFLAG(IS_MAC)

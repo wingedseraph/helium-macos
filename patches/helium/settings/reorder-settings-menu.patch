@@ -1,0 +1,53 @@
+Index: src/chrome/browser/resources/settings/route.ts
+===================================================================
+--- src.orig/chrome/browser/resources/settings/route.ts
++++ src/chrome/browser/resources/settings/route.ts
+@@ -354,7 +354,7 @@ export let routes: SettingsRoutes = Rout
+ // Returns the "effective" route when at chrome://settings/.
+ export function getTopLevelRoute(): Route {
+   if (!loadTimeData.getBoolean('isGuest')) {
+-    return routes.PEOPLE;
++    return routes.APPEARANCE;
+   }
+ 
+   let guestTopLevelRoute = routes.SEARCH;
+Index: src/chrome/browser/resources/settings/settings_menu/settings_menu.html
+===================================================================
+--- src.orig/chrome/browser/resources/settings/settings_menu/settings_menu.html
++++ src/chrome/browser/resources/settings/settings_menu/settings_menu.html
+@@ -67,6 +67,13 @@
+           $i18n{autofillPageTitle}
+           <cr-ripple></cr-ripple>
+         </a>
++        <a role="menuitem" id="appearance" href="/appearance"
++            hidden="[[!pageVisibility_.appearance]]"
++            class="cr-nav-menu-item">
++          <cr-icon icon="settings:style"></cr-icon>
++          $i18n{appearanceBehaviorPageTitle}
++          <cr-ripple></cr-ripple>
++        </a>
+         <a role="menuitem" href="/privacy"
+             hidden="[[!pageVisibility_.privacy]]"
+             class="cr-nav-menu-item">
+@@ -81,21 +88,6 @@
+           $i18n{performancePageTitle}
+           <cr-ripple></cr-ripple>
+         </a>
+-        <a role="menuitem" href="/ai"
+-            hidden="[[!showAiPageMenuItem_(showAiPage_, pageVisibility_.ai)]]"
+-            on-click="onAiPageClick_"
+-            class="cr-nav-menu-item">
+-          <cr-icon icon="settings20:magic"></cr-icon>
+-          $i18n{aiInnovationsPageTitle}
+-          <cr-ripple></cr-ripple>
+-        </a>
+-        <a role="menuitem" id="appearance" href="/appearance"
+-            hidden="[[!pageVisibility_.appearance]]"
+-            class="cr-nav-menu-item">
+-          <cr-icon icon="settings:style"></cr-icon>
+-          $i18n{appearanceBehaviorPageTitle}
+-          <cr-ripple></cr-ripple>
+-        </a>
+         <a role="menuitem" href="/search" class="cr-nav-menu-item">
+           <cr-icon icon="settings:search"></cr-icon>
+           $i18n{searchPageTitle}
