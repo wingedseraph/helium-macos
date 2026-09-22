@@ -1,13 +1,11 @@
 # Fix GN safe_browsing and building with safebrowsing disabled on macOS
 
-Index: src/chrome/browser/safe_browsing/BUILD.gn
-===================================================================
---- src.orig/chrome/browser/safe_browsing/BUILD.gn
-+++ src/chrome/browser/safe_browsing/BUILD.gn
-@@ -96,6 +96,10 @@ static_library("safe_browsing") {
+--- a/chrome/browser/safe_browsing/BUILD.gn
++++ b/chrome/browser/safe_browsing/BUILD.gn
+@@ -108,6 +108,10 @@ static_library("safe_browsing") {
    }
-
-
+ 
+ 
 +  sources = []
 +  deps = []
 +  allow_circular_includes_from = []
@@ -15,21 +13,19 @@ Index: src/chrome/browser/safe_browsing/BUILD.gn
    # Note: is_android is not equivalent to safe_browsing_mode == 2.
    # Sources and dependencies added to this block must not depend on anything
    # requiring safe_browsing_mode != 0.
-Index: src/chrome/browser/extensions/BUILD.gn
-===================================================================
---- src.orig/chrome/browser/extensions/BUILD.gn
-+++ src/chrome/browser/extensions/BUILD.gn
-@@ -833,9 +833,6 @@ source_set("extensions") {
+--- a/chrome/browser/extensions/BUILD.gn
++++ b/chrome/browser/extensions/BUILD.gn
+@@ -849,9 +849,6 @@ source_set("extensions") {
        # TODO(crbug.com/346472679): Remove this circular dependency.
        "//chrome/browser/web_applications/extensions",
-
+ 
 -      # TODO(crbug.com/41437292): Remove this circular dependency.
 -      "//chrome/browser/safe_browsing",
 -
        # TODO(crbug.com/343037853): Remove this circular dependency.
        "//chrome/browser/themes",
-
-@@ -868,7 +865,6 @@ source_set("extensions") {
+ 
+@@ -884,7 +881,6 @@ source_set("extensions") {
        "//chrome/common",
        "//chrome/common/extensions/api",
        "//components/omnibox/browser",
@@ -37,11 +33,9 @@ Index: src/chrome/browser/extensions/BUILD.gn
        "//components/safe_browsing/core/common/proto:realtimeapi_proto",
        "//components/translate/content/browser",
        "//content/public/browser",
-Index: src/chrome/browser/ui/BUILD.gn
-===================================================================
---- src.orig/chrome/browser/ui/BUILD.gn
-+++ src/chrome/browser/ui/BUILD.gn
-@@ -592,18 +592,9 @@ static_library("ui") {
+--- a/chrome/browser/ui/BUILD.gn
++++ b/chrome/browser/ui/BUILD.gn
+@@ -636,18 +636,9 @@ static_library("ui") {
      "//components/reading_list/core",
      "//components/renderer_context_menu",
      "//components/resources",
@@ -60,7 +54,7 @@ Index: src/chrome/browser/ui/BUILD.gn
      "//components/schema_org/common:improved_mojom",
      "//components/search_engines",
      "//components/security_interstitials/content:security_interstitial_page",
-@@ -5636,7 +5627,6 @@ group("ui_public_dependencies") {
+@@ -5741,7 +5732,6 @@ group("ui_public_dependencies") {
      "//components/dom_distiller/core",
      "//components/enterprise/buildflags",
      "//components/paint_preview/buildflags",
@@ -68,11 +62,9 @@ Index: src/chrome/browser/ui/BUILD.gn
      "//components/segmentation_platform/public",
      "//components/sync",
      "//components/sync_user_events",
-Index: src/chrome/browser/safe_browsing/download_protection/download_protection_service.cc
-===================================================================
---- src.orig/chrome/browser/safe_browsing/download_protection/download_protection_service.cc
-+++ src/chrome/browser/safe_browsing/download_protection/download_protection_service.cc
-@@ -388,8 +388,12 @@ void DownloadProtectionService::ShowDeta
+--- a/chrome/browser/safe_browsing/download_protection/download_protection_service.cc
++++ b/chrome/browser/safe_browsing/download_protection/download_protection_service.cc
+@@ -379,8 +379,12 @@ void DownloadProtectionService::ShowDeta
    Profile* profile = Profile::FromBrowserContext(
        content::DownloadItemUtils::GetBrowserContext(item));
    if (profile &&
@@ -85,10 +77,8 @@ Index: src/chrome/browser/safe_browsing/download_protection/download_protection_
        item->GetDangerType() ==
            download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT) {
      learn_more_url = GURL(chrome::kAdvancedProtectionDownloadLearnMoreURL);
-Index: src/chrome/browser/download/notification/download_item_notification.cc
-===================================================================
---- src.orig/chrome/browser/download/notification/download_item_notification.cc
-+++ src/chrome/browser/download/notification/download_item_notification.cc
+--- a/chrome/browser/download/notification/download_item_notification.cc
++++ b/chrome/browser/download/notification/download_item_notification.cc
 @@ -974,9 +974,13 @@ std::u16string DownloadItemNotification:
      }
      case download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT: {
@@ -103,10 +93,8 @@ Index: src/chrome/browser/download/notification/download_item_notification.cc
        return l10n_util::GetStringFUTF16(
            requests_ap_verdicts
                ? IDS_PROMPT_UNCOMMON_DOWNLOAD_CONTENT_IN_ADVANCED_PROTECTION
-Index: src/chrome/browser/ui/webui/downloads/downloads_ui.cc
-===================================================================
---- src.orig/chrome/browser/ui/webui/downloads/downloads_ui.cc
-+++ src/chrome/browser/ui/webui/downloads/downloads_ui.cc
+--- a/chrome/browser/ui/webui/downloads/downloads_ui.cc
++++ b/chrome/browser/ui/webui/downloads/downloads_ui.cc
 @@ -40,6 +40,7 @@
  #include "components/history/core/common/pref_names.h"
  #include "components/prefs/pref_service.h"
@@ -118,7 +106,7 @@ Index: src/chrome/browser/ui/webui/downloads/downloads_ui.cc
 @@ -68,10 +69,12 @@ content::WebUIDataSource* CreateAndAddDo
    webui::SetupWebUIDataSource(source, kDownloadsResources,
                                IDR_DOWNLOADS_DOWNLOADS_HTML);
-
+ 
 -  bool requests_ap_verdicts =
 -      safe_browsing::AdvancedProtectionStatusManagerFactory::GetForProfile(
 +  bool requests_ap_verdicts = false;
@@ -128,12 +116,10 @@ Index: src/chrome/browser/ui/webui/downloads/downloads_ui.cc
            ->IsUnderAdvancedProtection();
 +#endif
    source->AddBoolean("requestsApVerdicts", requests_ap_verdicts);
-
+ 
    static constexpr webui::LocalizedString kStrings[] = {
-Index: src/chrome/browser/ui/extensions/download_danger_dialog.cc
-===================================================================
---- src.orig/chrome/browser/ui/extensions/download_danger_dialog.cc
-+++ src/chrome/browser/ui/extensions/download_danger_dialog.cc
+--- a/chrome/browser/ui/extensions/download_danger_dialog.cc
++++ b/chrome/browser/ui/extensions/download_danger_dialog.cc
 @@ -19,6 +19,7 @@
  #include "chrome/grit/branded_strings.h"
  #include "chrome/grit/generated_resources.h"
@@ -158,12 +144,10 @@ Index: src/chrome/browser/ui/extensions/download_danger_dialog.cc
            filename);
      case download::DOWNLOAD_DANGER_TYPE_POTENTIALLY_UNWANTED:
        return l10n_util::GetStringFUTF16(IDS_PROMPT_DOWNLOAD_CHANGES_SETTINGS,
-Index: src/chrome/test/BUILD.gn
-===================================================================
---- src.orig/chrome/test/BUILD.gn
-+++ src/chrome/test/BUILD.gn
-@@ -7853,12 +7853,8 @@ test("unit_tests") {
-       "//chrome/browser/apps/app_shim",
+--- a/chrome/test/BUILD.gn
++++ b/chrome/test/BUILD.gn
+@@ -7899,12 +7899,8 @@ test("unit_tests") {
+       "//chrome/browser/mac:unit_tests",
        "//chrome/browser/renderer_host:history_swiper",
        "//chrome/common/notifications",
 -      "//chrome/common/safe_browsing:archive_analyzer_results",
@@ -175,14 +159,12 @@ Index: src/chrome/test/BUILD.gn
        "//components/enterprise/platform_auth:enterprise_platform_auth",
        "//components/power_metrics",
        "//media/capture:test_support",
-Index: src/chrome/services/file_util/BUILD.gn
-===================================================================
---- src.orig/chrome/services/file_util/BUILD.gn
-+++ src/chrome/services/file_util/BUILD.gn
+--- a/chrome/services/file_util/BUILD.gn
++++ b/chrome/services/file_util/BUILD.gn
 @@ -50,10 +50,6 @@ source_set("file_util") {
      deps += [ "//components/services/filesystem/public/mojom" ]
    }
-
+ 
 -  if (is_mac) {
 -    deps += [ "//chrome/utility/safe_browsing" ]
 -  }
@@ -190,14 +172,12 @@ Index: src/chrome/services/file_util/BUILD.gn
    if (safe_browsing_mode == 1) {
      sources += [
        "obfuscated_archive_analysis_delegate.cc",
-Index: src/chrome/browser/policy/configuration_policy_handler_list_factory.cc
-===================================================================
---- src.orig/chrome/browser/policy/configuration_policy_handler_list_factory.cc
-+++ src/chrome/browser/policy/configuration_policy_handler_list_factory.cc
-@@ -2393,15 +2393,6 @@ const PolicyToPreferenceMapEntry kSimple
+--- a/chrome/browser/policy/configuration_policy_handler_list_factory.cc
++++ b/chrome/browser/policy/configuration_policy_handler_list_factory.cc
+@@ -2406,15 +2406,6 @@ const PolicyToPreferenceMapEntry kSimple
      base::Value::Type::BOOLEAN },
  #endif
-
+ 
 -#if BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
 -  { key::kProvisionManagedClientCertificateForUser,
 -    client_certificates::prefs::kProvisionManagedClientCertificateForUserPrefs,
@@ -210,11 +190,9 @@ Index: src/chrome/browser/policy/configuration_policy_handler_list_factory.cc
  #if BUILDFLAG(IS_CHROMEOS)
    { key::kDeviceAuthenticationFlowAutoReloadInterval,
      ash::prefs::kAuthenticationFlowAutoReloadInterval,
-Index: src/chrome/browser/chrome_content_browser_client.cc
-===================================================================
---- src.orig/chrome/browser/chrome_content_browser_client.cc
-+++ src/chrome/browser/chrome_content_browser_client.cc
-@@ -8132,33 +8132,6 @@ bool ChromeContentBrowserClient::SetupEm
+--- a/chrome/browser/chrome_content_browser_client.cc
++++ b/chrome/browser/chrome_content_browser_client.cc
+@@ -8290,33 +8290,6 @@ bool ChromeContentBrowserClient::SetupEm
      CHECK(!soda_language_pack_path.empty());
      CHECK(serializer->SetParameter(sandbox::policy::kParamSodaLanguagePackPath,
                                     soda_language_pack_path.value()));
@@ -246,5 +224,5 @@ Index: src/chrome/browser/chrome_content_browser_client.cc
 -        sandbox::policy::kParamTranslatekitComponentPath,
 -        translatekit_binary_path.value());
    }
-
+ 
    return false;
