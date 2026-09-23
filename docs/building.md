@@ -26,6 +26,49 @@
 1. Unlink binutils to use the one provided with Xcode: `brew unlink binutils`
 1. Restart your terminal.
 
+## Building without Xcode (patch-only local workflow)
+
+Building Helium requires **Xcode 26**. If your machine runs a macOS version
+older than Xcode 26 supports, Xcode 26 can't be installed, and only the
+Command Line Tools are available. In that case the toolchain steps that call
+`xcodebuild` fail and neither `he configure` nor `he build` can run locally.
+The symptom is a GN error while resolving the macOS SDK:
+
+```
+xcode-select: error: tool 'xcodebuild' requires Xcode, but active developer
+directory '/Library/Developer/CommandLineTools' is a command line tools instance
+...
+ERROR at //build/config/mac/mac_sdk.gni: Script returned non-zero exit code.
+```
+
+On such a machine, keep the local role limited to **authoring patches** and let
+**GitHub Actions** do the compile.
+
+### What works locally (no Xcode)
+
+- Downloading/unpacking the Chromium source and working on patches against it.
+- `quilt` patch authoring: `quilt new`, `quilt add`, `quilt edit`,
+  `quilt refresh`, `quilt push` / `quilt pop`.
+- `he` helpers that only touch the source tree and the patch series:
+  `he push`, `he pop`, `he merge`, `he unmerge`,
+  `he validate patches`, `he validate series`.
+
+### What does NOT work locally (needs Xcode 26)
+
+- `he configure` — runs `gn gen`, which reads the macOS SDK via `xcodebuild`.
+- `he build` / `./build.sh` — compiles and links.
+- Everything downstream: signing and packaging the `.dmg`.
+
+### Build through GitHub Actions instead
+
+1. Commit your patch and `series` changes to a branch and push it to GitHub.
+2. Trigger the dev build workflow from the **Actions** tab, or with the GitHub CLI:
+   - Workflow: **Build dev macOS binary (with dSYM for crash debugging)**
+     (`.github/workflows/build-dev.yml`), run via `workflow_dispatch`.
+   - CLI: `gh workflow run build-dev.yml --ref <your-branch>`
+3. The job builds on `macos-latest` (which has Xcode) and uploads the binary
+   artifact — so no Xcode is ever needed on your machine.
+
 ## Official (non-development) build
 
 First, ensure the Xcode application is open.
