@@ -16,8 +16,13 @@ echo $(date +%s) | tee -a "$_root_dir/build_times_$_target_cpu.log"
 echo "status=running" >> $GITHUB_OUTPUT
 
 if ! env | grep -q SCCACHE; then
-    export SCCACHE_GHA_ENABLED=on
-    export SCCACHE_GHA_VERSION="$_target_cpu"
+    # This fork has no remote sccache backend provisioned (no WebDAV cache
+    # secrets, and the GitHub Actions cache backend is not available here).
+    # Forcing SCCACHE_GHA_ENABLED=on makes sccache fail to start with
+    # "cache url for ghac not found". Fall back to sccache's self-contained
+    # local disk cache instead so the build can proceed.
+    export SCCACHE_DIR="${SCCACHE_DIR:-$HOME/.cache/sccache}"
+    export SCCACHE_CACHE_SIZE="20G"
 fi
 
 export SCCACHE_WEBDAV_KEY_PREFIX="$_target_cpu"
