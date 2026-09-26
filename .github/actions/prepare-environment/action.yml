@@ -2,6 +2,14 @@ name: Prepare build environment
 runs:
   using: composite
   steps:
+    # Expose the GitHub Actions cache service env (ACTIONS_RESULTS_URL /
+    # ACTIONS_RUNTIME_TOKEN) to subsequent run steps. GitHub does not hand
+    # these to plain shell steps, so without this bridge sccache's GHA
+    # backend fails to start ("cache url for ghac not found") and every
+    # build phase compiles from a cold cache. This bridge is what lets the
+    # multi-phase resume reuse compiled objects across phases.
+    - name: Expose GitHub Actions cache runtime env for sccache
+      uses: crazy-max/ghaction-github-runtime@v3
     - name: Setup Python 3.13
       uses: actions/setup-python@v6
       with:
